@@ -1,0 +1,9 @@
+﻿<Project>
+
+  <PropertyGroup>
+    <Company>junk-machine</Company>
+    <Product>Calendaro .NET</Product>
+    <Version>0.1.0.0</Version>
+  </PropertyGroup>
+
+</Project>
