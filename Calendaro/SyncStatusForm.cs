@@ -1,6 +1,7 @@
 ﻿using Calendaro.EventsTracking;
 using Calendaro.Properties;
 using Calendaro.Settings;
+using System.Text;
 
 namespace Calendaro
 {
@@ -109,7 +110,48 @@ namespace Calendaro
                 // For the failed calendars - display synchronization error message
                 if (e.Node.Tag is CalendarSyncException syncError)
                 {
-                    MessageBox.Show(this, syncError.Message, Resources.SyncFailedTitle, MessageBoxButtons.OK, MessageBoxIcon.Error);
+                    var errorMessage = new StringBuilder();
+                    GetCombinedErrorMessage(syncError, errorMessage);
+
+                    MessageBox.Show(
+                        this,
+                        errorMessage.ToString(),
+                        Resources.SyncFailedTitle,
+                        MessageBoxButtons.OK,
+                        MessageBoxIcon.Error);
+                }
+            }
+        }
+
+        /// <summary>
+        /// Concatenates error messages of all inner exceptions together.
+        /// </summary>
+        /// <param name="exception">Top-most exception to start message concatenation from.</param>
+        /// <param name="result">Error messages of all inner exceptions concatenated together.</param>
+        private static void GetCombinedErrorMessage(Exception exception, StringBuilder result)
+        {
+            while (exception != null)
+            {
+                if (result.Length > 0)
+                {
+                    result.Append(' ');
+                }
+
+                if (exception is AggregateException aggregateException)
+                {
+                    foreach (var nestedException in aggregateException.InnerExceptions)
+                    {
+                        GetCombinedErrorMessage(nestedException, result);
+                    }
+                }
+                else
+                {
+                    result.AppendLine(exception.Message);
+                }
+
+                if (result[^1] != '.')
+                {
+                    result.Append('.');
                 }
             }
         }
