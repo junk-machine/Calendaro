@@ -1,4 +1,5 @@
 ﻿using Calendaro.Abstractions;
+using Calendaro.GoogleCalendar.Properties;
 using Calendaro.Utilities;
 using Google;
 using Google.Apis.Auth.OAuth2.Responses;
@@ -333,7 +334,7 @@ namespace Calendaro.GoogleCalendar
 
             return new CalendarEventInfo(
                 calendarEvent.Id,
-                calendarEvent.Summary,
+                calendarEvent.Summary ?? Resources.NoTitle,
                 calendarEvent.HtmlLink,
                 GetConferenceUri(calendarEvent),
                 startTime,
