@@ -128,7 +128,7 @@ namespace Calendaro
         /// </summary>
         /// <param name="exception">Top-most exception to start message concatenation from.</param>
         /// <param name="result">Error messages of all inner exceptions concatenated together.</param>
-        private static void GetCombinedErrorMessage(Exception exception, StringBuilder result)
+        private static void GetCombinedErrorMessage(Exception? exception, StringBuilder result)
         {
             while (exception != null)
             {
@@ -143,10 +143,14 @@ namespace Calendaro
                     {
                         GetCombinedErrorMessage(nestedException, result);
                     }
+
+                    // At this point we have processed all inner exceptions, just bail out
+                    return;
                 }
                 else
                 {
                     result.AppendLine(exception.Message);
+                    exception = exception.InnerException;
                 }
 
                 if (result[^1] != '.')
