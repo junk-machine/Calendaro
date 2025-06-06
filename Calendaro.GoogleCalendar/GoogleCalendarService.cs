@@ -189,10 +189,14 @@ namespace Calendaro.GoogleCalendar
                 // list of cached events, until the next successful sync.
                 clearCache = true;
 
-                listEventsRequest.TimeMin =
-                    new DateTime(calendarSyncState.LastSyncDay * TimeSpan.TicksPerDay - 10 * TimeSpan.TicksPerMinute);
-                listEventsRequest.TimeMax =
-                    new DateTime((calendarSyncState.LastSyncDay + 10) * TimeSpan.TicksPerDay);
+                listEventsRequest.TimeMinDateTimeOffset =
+                    new DateTimeOffset(
+                        calendarSyncState.LastSyncDay * TimeSpan.TicksPerDay - 10 * TimeSpan.TicksPerMinute,
+                        TimeSpan.Zero);
+                listEventsRequest.TimeMaxDateTimeOffset =
+                    new DateTimeOffset(
+                        (calendarSyncState.LastSyncDay + 10) * TimeSpan.TicksPerDay,
+                        TimeSpan.Zero);
             }
 
             try
@@ -225,7 +229,8 @@ namespace Calendaro.GoogleCalendar
                             .RemoveFirst(@event => @event.Id == calendarEvent.Id);
                     }
 
-                    if (calendarEvent.Start != null)
+                    if (!"cancelled".Equals(calendarEvent.Status, StringComparison.OrdinalIgnoreCase)
+                            && calendarEvent.Start != null)
                     {
                         calendarSyncState.CachedEvents.Add(
                             AsEventInfo(calendarEvent, defaultReminderInterval));
@@ -309,7 +314,7 @@ namespace Calendaro.GoogleCalendar
         /// <returns>Simplified internal event data structure.</returns>
         private static CalendarEventInfo AsEventInfo(Event calendarEvent, int? defaultReminderInterval)
         {
-            var isAllDay = calendarEvent.Start.DateTime is null;
+            var isAllDay = calendarEvent.Start.DateTimeDateTimeOffset is null;
             var startTime = AsDateTime(calendarEvent.Start);
             var endTime = AsDateTime(calendarEvent.End);
 
